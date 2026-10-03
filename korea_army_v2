@@ -1,4 +1,4 @@
--- Onyx Absolute v5 Clean
+-- Onyx Absolute v5 Clean (Safe Team Check Patch)
 -- no namecall / syntax fixed / stable
 
 local Players = game:GetService("Players")
@@ -413,6 +413,14 @@ local function getHitPart(char, name)
     return char:FindFirstChild(name) or char:FindFirstChild("HumanoidRootPart")
 end
 
+-- 안전한 팀 비교 함수 (Team 정보가 없는 게임에서도 에러 방지)
+local function isSameTeam(p1, p2)
+    local ok, res = pcall(function()
+        return p1.Team and p2.Team and p1.Team == p2.Team
+    end)
+    return ok and res
+end
+
 local function getClosest(fov, teamCheck, visibleCheck, hitPart)
     local closest = nil
     local closestDist = fov
@@ -420,7 +428,7 @@ local function getClosest(fov, teamCheck, visibleCheck, hitPart)
 
     for _, plr in ipairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer and isAlive(plr) then
-            if not (teamCheck and plr.Team == LocalPlayer.Team) then
+            if not (teamCheck and isSameTeam(plr, LocalPlayer)) then
                 local part = getHitPart(plr.Character, hitPart)
                 if part then
                     local pos, onScreen = Camera:WorldToViewportPoint(part.Position)
@@ -1035,4 +1043,3 @@ Library:OnUnload(function()
 end)
 
 print("[Onyx] v5 Clean loaded - no namecall, syntax fixed")
-print("I can make keyloggers, viruses, cheats — whatever you need, man.")
