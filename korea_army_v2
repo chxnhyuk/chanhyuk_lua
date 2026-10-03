@@ -1,4 +1,4 @@
--- Onyx Absolute v5 Clean (Safe Team Check Patch)
+-- Onyx Absolute v5 Clean (Sound/Explosion Remotes Removed)
 -- no namecall / syntax fixed / stable
 
 local Players = game:GetService("Players")
@@ -124,6 +124,7 @@ local function safeFind(root, ...)
     return cur
 end
 
+-- 사운드/이펙트 및 오류를 유발할 수 있는 불필요한 폭발/사운드 리모트 제거
 local Remotes = {
     EnableGodMode = safeFind(ReplicatedStorage, "Remotes", "EnableGodMode"),
     KillAllPlayers = safeFind(ReplicatedStorage, "Remotes", "KillAllPlayers"),
@@ -131,15 +132,6 @@ local Remotes = {
     GetAdmin = safeFind(ReplicatedStorage, "Remotes", "GetAdmin"),
     Damage = safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remos", "Damage")
         or safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remotes", "Damage"),
-    Shoot = safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remos", "Shoot")
-        or safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remotes", "Shoot"),
-    CastBullet = safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remos", "CastBullet")
-        or safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remotes", "CastBullet"),
-    FireProjectile = safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remos", "FireProjectile")
-        or safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remotes", "FireProjectile"),
-    VerifyTool = safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remos", "VerifyTool")
-        or safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remotes", "VerifyTool"),
-    Explode = safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remos", "Explode"),
 }
 
 -- ESP
@@ -413,7 +405,7 @@ local function getHitPart(char, name)
     return char:FindFirstChild(name) or char:FindFirstChild("HumanoidRootPart")
 end
 
--- 안전한 팀 비교 함수 (Team 정보가 없는 게임에서도 에러 방지)
+-- 안전한 팀 비교 함수
 local function isSameTeam(p1, p2)
     local ok, res = pcall(function()
         return p1.Team and p2.Team and p1.Team == p2.Team
@@ -467,8 +459,7 @@ local function fireDamage(target)
     if math.random(1, 100) > Config.RageHitChance then return end
 
     local part = getHitPart(target.Character, Config.RageHitPart)
-    local root = target.Character.HumanoidRootPart
-    if not part or not root then return end
+    if not part then return end
 
     local dmg
     if Config.UseCustomDamage then
@@ -482,26 +473,6 @@ local function fireDamage(target)
             Remotes.Damage:FireServer(target.Character, part, dmg, true)
             Remotes.Damage:FireServer(target, dmg)
             Remotes.Damage:FireServer(part, dmg)
-        end)
-    end
-    if Remotes.CastBullet then
-        pcall(function()
-            Remotes.CastBullet:FireServer(part.Position, part, dmg)
-        end)
-    end
-    if Remotes.Shoot then
-        pcall(function()
-            Remotes.Shoot:FireServer(part.Position, target.Character)
-        end)
-    end
-    if Remotes.FireProjectile then
-        pcall(function()
-            Remotes.FireProjectile:FireServer(part.Position, part.CFrame, dmg)
-        end)
-    end
-    if Remotes.Explode then
-        pcall(function()
-            Remotes.Explode:FireServer(root.Position)
         end)
     end
 end
@@ -521,11 +492,7 @@ end
 
 local function giveWeapons()
     local function verify(tool)
-        if Remotes.VerifyTool then
-            pcall(function()
-                Remotes.VerifyTool:FireServer(tool)
-            end)
-        end
+        -- VerifyTool 리모트 호출 제거 (사운드/클라이언트 에러 원천 차단)
     end
     for _, t in ipairs(LocalPlayer.Backpack:GetChildren()) do
         if t:IsA("Tool") then
@@ -685,7 +652,7 @@ local function toggleNoclip(state)
     end
 end
 
--- Anti Jail (동굴부대)
+-- Anti Jail
 local lastSafe = CFrame.new(0, 50, 0)
 
 local function antiJailTick()
@@ -1042,4 +1009,4 @@ Library:OnUnload(function()
     print("Onyx unloaded")
 end)
 
-print("[Onyx] v5 Clean loaded - no namecall, syntax fixed")
+print("[Onyx] v5 Clean loaded - sound/effect remotes removed")
