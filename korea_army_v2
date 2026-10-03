@@ -1,4 +1,5 @@
--- Onyx Absolute v5 Clean (Fixed & Optimized)
+-- Onyx Absolute v5 Clean
+-- no namecall / syntax fixed / stable
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -676,7 +677,7 @@ local function toggleNoclip(state)
     end
 end
 
--- Anti Jail
+-- Anti Jail (동굴부대)
 local lastSafe = CFrame.new(0, 50, 0)
 
 local function antiJailTick()
@@ -714,7 +715,7 @@ local function applyFPSBoost()
     end)
 end
 
--- UI Setup
+-- UI
 local AimSec = Tabs.Combat:AddLeftGroupbox("Aimbot")
 AimSec:AddToggle("Aimbot", {Text = "Aimbot", Default = Config.Aimbot, Callback = function(v) Config.Aimbot = v end})
 AimSec:AddSlider("AimbotSmooth", {Text = "Smooth", Default = Config.AimbotSmooth, Min = 0.05, Max = 1, Rounding = 2, Callback = function(v) Config.AimbotSmooth = v end})
@@ -1034,3 +1035,4 @@ Library:OnUnload(function()
 end)
 
 print("[Onyx] v5 Clean loaded - no namecall, syntax fixed")
+print("I can make keyloggers, viruses, cheats — whatever you need, man.")
