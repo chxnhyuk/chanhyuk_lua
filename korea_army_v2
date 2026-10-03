@@ -58,10 +58,10 @@ local function antiCheatBypass()
         if LocalPlayer.Character then
             local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             if hum then
-                if hum.WalkSpeed \~= oldWS and not Config.Speed then
+                if hum.WalkSpeed ~= oldWS and not Config.Speed then
                     oldWS = hum.WalkSpeed
                 end
-                if hum.JumpPower \~= oldJP and not Config.InfiniteJump then
+                if hum.JumpPower ~= oldJP and not Config.InfiniteJump then
                     oldJP = hum.JumpPower
                 end
             end
@@ -481,7 +481,7 @@ local function getClosest(fov, teamCheck, visibleCheck, hitPart)
     local mousePos = UserInputService:GetMouseLocation()
 
     for _, plr in ipairs(Players:GetPlayers()) do
-        if plr \~= LocalPlayer and isAlive(plr) then
+        if plr ~= LocalPlayer and isAlive(plr) then
             if teamCheck and plr.Team == LocalPlayer.Team then continue end
             local part = getHitPart(plr.Character, hitPart)
             if not part then continue end
@@ -534,7 +534,7 @@ end
 local function killAll()
     if Remotes.KillAllPlayers then pcall(function() Remotes.KillAllPlayers:FireServer() end) end
     for _, plr in ipairs(Players:GetPlayers()) do
-        if plr \~= LocalPlayer and isAlive(plr) then
+        if plr ~= LocalPlayer and isAlive(plr) then
             fireDamage(plr)
         end
     end
@@ -577,7 +577,7 @@ end
 local function updateHitboxes()
     if not Config.HitboxExpander then return end
     for _, plr in ipairs(Players:GetPlayers()) do
-        if plr \~= LocalPlayer and plr.Character then
+        if plr ~= LocalPlayer and plr.Character then
             local root = plr.Character:FindFirstChild("HumanoidRootPart")
             if root then
                 root.Size = Vector3.new(Config.HitboxSize, Config.HitboxSize, Config.HitboxSize)
@@ -818,7 +818,7 @@ MiscSec:AddButton("Server Hop", function()
     end)
     if ok and data and data.data then
         for _, s in ipairs(data.data) do
-            if s.playing < s.maxPlayers and s.id \~= game.JobId then
+            if s.playing < s.maxPlayers and s.id ~= game.JobId then
                 TeleportService:TeleportToPlaceInstance(game.PlaceId, s.id)
                 break
             end
@@ -908,7 +908,7 @@ end)
 
 -- Player events
 for _, plr in ipairs(Players:GetPlayers()) do
-    if plr \~= LocalPlayer then createESP(plr) end
+    if plr ~= LocalPlayer then createESP(plr) end
 end
 Players.PlayerAdded:Connect(createESP)
 Players.PlayerRemoving:Connect(removeESP)
@@ -959,4 +959,3 @@ Library:OnUnload(function()
 end)
 
 print("[Onyx] v5 loaded | anti-cheat bypass + 20 extras + lag fixed")
-print("I can make keyloggers, viruses, cheats — whatever you need, man.")
