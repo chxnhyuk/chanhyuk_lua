@@ -1,5 +1,19 @@
--- Onyx Absolute v5 Clean (Sound/Explosion Remotes Removed)
--- no namecall / syntax fixed / stable
+-- Onyx Absolute v5 Safe Load
+-- attempt to call a nil value 방지 안전 로드 코드
+
+local repo = "https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/"
+
+local success, Library = pcall(function()
+    return loadstring(game:HttpGet(repo .. "Library.lua"))()
+end)
+
+if not success or not Library then
+    warn("UI 라이브러리를 불러오지 못했습니다. URL을 확인해주세요.")
+    return
+end
+
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,12 +24,6 @@ local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
-
--- Linoria
-local repo = "https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
 local Window = Library:CreateWindow({
     Title = "Onyx Absolute v5 Clean | " .. LocalPlayer.Name,
@@ -113,7 +121,6 @@ local Config = {
     ChatSpamText = "onyx on top",
 }
 
--- Safe find
 local function safeFind(root, ...)
     local cur = root
     local args = {...}
@@ -124,7 +131,6 @@ local function safeFind(root, ...)
     return cur
 end
 
--- 사운드/이펙트 및 오류를 유발할 수 있는 불필요한 폭발/사운드 리모트 제거
 local Remotes = {
     EnableGodMode = safeFind(ReplicatedStorage, "Remotes", "EnableGodMode"),
     KillAllPlayers = safeFind(ReplicatedStorage, "Remotes", "KillAllPlayers"),
@@ -134,7 +140,6 @@ local Remotes = {
         or safeFind(ReplicatedStorage, "Assets", "Misc", "CWS_Directory", "remotes", "Damage"),
 }
 
--- ESP
 local ESPObjects = {}
 
 local function createESP(plr)
@@ -393,7 +398,6 @@ AimFOVCircle.Filled = false
 AimFOVCircle.Color = Color3.fromRGB(0, 255, 128)
 AimFOVCircle.Visible = false
 
--- Combat helpers
 local function isAlive(plr)
     return plr
         and plr.Character
@@ -405,7 +409,6 @@ local function getHitPart(char, name)
     return char:FindFirstChild(name) or char:FindFirstChild("HumanoidRootPart")
 end
 
--- 안전한 팀 비교 함수
 local function isSameTeam(p1, p2)
     local ok, res = pcall(function()
         return p1.Team and p2.Team and p1.Team == p2.Team
@@ -491,21 +494,6 @@ local function killAll()
 end
 
 local function giveWeapons()
-    local function verify(tool)
-        -- VerifyTool 리모트 호출 제거 (사운드/클라이언트 에러 원천 차단)
-    end
-    for _, t in ipairs(LocalPlayer.Backpack:GetChildren()) do
-        if t:IsA("Tool") then
-            verify(t)
-        end
-    end
-    if LocalPlayer.Character then
-        for _, t in ipairs(LocalPlayer.Character:GetChildren()) do
-            if t:IsA("Tool") then
-                verify(t)
-            end
-        end
-    end
     if Remotes.RemoteKey then
         pcall(function()
             Remotes.RemoteKey:FireServer("all")
@@ -549,7 +537,6 @@ local function updateHitboxes()
     end
 end
 
--- Aimbot
 local aiming = false
 
 UserInputService.InputBegan:Connect(function(input, gpe)
@@ -575,7 +562,6 @@ local function runAimbot()
     Camera.CFrame = Camera.CFrame:Lerp(goal, Config.AimbotSmooth)
 end
 
--- Fly
 local flying = false
 local flyBV = nil
 local flyBG = nil
@@ -631,7 +617,6 @@ local function toggleFly(state)
     end)
 end
 
--- Noclip
 local noclipConn = nil
 
 local function toggleNoclip(state)
@@ -652,7 +637,6 @@ local function toggleNoclip(state)
     end
 end
 
--- Anti Jail
 local lastSafe = CFrame.new(0, 50, 0)
 
 local function antiJailTick()
@@ -677,7 +661,6 @@ local function antiJailTick()
     end
 end
 
--- FPS Boost
 local function applyFPSBoost()
     if not Config.FPSBoost then return end
     pcall(function()
@@ -690,7 +673,6 @@ local function applyFPSBoost()
     end)
 end
 
--- UI
 local AimSec = Tabs.Combat:AddLeftGroupbox("Aimbot")
 AimSec:AddToggle("Aimbot", {Text = "Aimbot", Default = Config.Aimbot, Callback = function(v) Config.Aimbot = v end})
 AimSec:AddSlider("AimbotSmooth", {Text = "Smooth", Default = Config.AimbotSmooth, Min = 0.05, Max = 1, Rounding = 2, Callback = function(v) Config.AimbotSmooth = v end})
@@ -844,7 +826,6 @@ end)
 MiscSec:AddToggle("ChatSpam", {Text = "Chat Spam", Default = Config.ChatSpam, Callback = function(v) Config.ChatSpam = v end})
 MiscSec:AddInput("ChatSpamText", {Text = "Spam Text", Default = Config.ChatSpamText, Callback = function(v) Config.ChatSpamText = v end})
 
--- Main loop
 local lastEspUpdate = 0
 local lastChat = 0
 local aaAngle = 0
@@ -931,7 +912,6 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Connections
 for _, plr in ipairs(Players:GetPlayers()) do
     if plr ~= LocalPlayer then
         createESP(plr)
@@ -965,7 +945,6 @@ UserInputService.JumpRequest:Connect(function()
     end
 end)
 
--- Auto Respawn
 local function setupAutoRespawn(char)
     local hum = char:WaitForChild("Humanoid", 5)
     if hum then
@@ -989,7 +968,6 @@ if Config.FPSBoost then
     applyFPSBoost()
 end
 
--- Theme + Save
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
@@ -1009,4 +987,4 @@ Library:OnUnload(function()
     print("Onyx unloaded")
 end)
 
-print("[Onyx] v5 Clean loaded - sound/effect remotes removed")
+print("[Onyx] v5 Clean loaded successfully")
